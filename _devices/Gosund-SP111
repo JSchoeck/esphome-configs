@@ -1,0 +1,89 @@
+
+Work in progress
+
+---
+title: Gosund SP111
+date-published: 2019-12-26
+type: plug
+standard: eu
+---
+1. TOC
+{:toc}
+
+## GPIO Pinout
+
+| Pin     | Function                           |
+|---------|------------------------------------|
+| GPIO0   | Status LED - Red (inverted)        |
+| GPIO3   | sel_pin hlw8012 (inverted)         |
+| GPIO5   | cf_pin hlw8012                     |
+| GPIO12  | Relay                              |
+| GPIO13  | Button (inverted)                  |
+| GPIO14  | cf1_pin hlw8012                    |
+| GPIO15  | Status LED - Blue (inverted)       |
+
+
+## Basic Configuration
+```yaml
+# Basic Config
+# https://www.brilliantsmart.com.au/smart-products/electrical/wifi-plug-with-usb-charger/
+esphome:
+  name: brilliant_1
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+  
+wifi:
+  ssid: 'ssid'
+  password: 'password'
+  ap:
+    ssid: 'brilliant1'
+    password: 'ap_password'
+  domain: '.xxxxx.com'
+  
+logger:
+
+web_server:
+
+api:
+  password: 'api_password'
+
+ota:
+  password: 'ota_password'
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Brilliant_1 Button"
+    on_press:
+      - switch.toggle: relay
+  - platform: status
+    name: "Brilliant_1 Status"
+
+sensor:
+  - platform: wifi_signal
+    name: "Brilliant 1 WiFi Signal"
+    update_interval: 60s
+
+switch:
+  - platform: gpio
+    name: "Brilliant_1 Relay"
+    pin: GPIO5
+    id: 'relay'
+  - platform: restart
+    name: "Brilliant_1 Restart"
+output:
+  - platform: esp8266_pwm
+    id: brilliant_1_red_led
+    pin:
+      number: GPIO13
+      inverted: True
+
+light:
+  - platform: monochromatic
+    name: "Brilliant_1  LED"
+    output: brilliant_1_red_led
+```
